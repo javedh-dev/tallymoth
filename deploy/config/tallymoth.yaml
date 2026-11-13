@@ -1,0 +1,35 @@
+version: 1
+server:
+  listen: {public: ":8080", private: ":8081"}
+  data_dir: /data
+  # trust_proxy / trusted_hops come from env in docker-compose.yml
+
+defaults:
+  auth: {mode: signed, pow_bits: 16}
+  limits: {max_body_bytes: 32768, max_batch_events: 50, ip_per_minute: 30, daily_cap: 1000000, max_db_mb: 2048}
+  retention_days: 90
+
+tenants:
+  # A public app that ships its key (see examples/scalebar/tenant.yaml for a fuller one).
+  - id: scalebar
+    purpose: "Daily active count, feature usage and compatibility data for the ScaleBar macOS app."
+    privacy_policy_url: https://github.com/javedh-dev/ScaleBar/blob/main/PRIVACY.md
+    keys:
+      - {id: k_scalebar1, secret: "${SCALEBAR_KEY}"}    # `tallymoth keygen signed` makes one
+    retention_days: 180
+    limits: {daily_cap: 50000, max_batch_events: 12}
+    events:
+      active: [version, os, arch, model, cpu, cores, ram_gb, disk_gb, externals]
+      monitor: [version, os, model, vendor, product, name, width, height, hz, builtin]
+      scale_changed: [version, os, scale, virtual, builtin]
+      brightness_used: [version, os]
+      volume_used: [version, os]
+      keys_used: [version, os]
+      error: [version, os, model, kind, vendor, product, name]
+
+  # A trusted server-side app: bearer key (stored hashed), schemaless props.
+  # - id: backend
+  #   auth: {mode: bearer}
+  #   keys: [{sha256: "<from `tallymoth keygen write`>"}]
+  #   schema: open
+  #   retention_days: 30

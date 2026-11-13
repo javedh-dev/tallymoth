@@ -1,0 +1,35 @@
+# docker compose -f deploy/docker-compose.yml up -d     (needs .env: see .env.example)
+# Assumes an existing Traefik on the external docker network below; Traefik terminates TLS.
+services:
+  tallymoth:
+    build: {context: .., dockerfile: deploy/Dockerfile}
+    # image: ghcr.io/javedh-dev/tallymoth:${TALLYMOTH_VERSION:-latest}
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    stop_grace_period: 20s
+    environment:
+      TALLYMOTH_TRUST_PROXY: "1"        # client IP from X-Forwarded-For (rate limiting only, never stored)
+      TALLYMOTH_TRUSTED_HOPS: "1"       # proxies in front: Traefik only = 1; Cloudflare + Traefik = 2
+      GOMEMLIMIT: 100MiB
+      SCALEBAR_KEY: ${SCALEBAR_KEY:-}   # referenced as ${SCALEBAR_KEY} in config/tallymoth.yaml
+    volumes:
+      - data:/data                      # must be writable by uid 65532
+      - ./config:/config:ro
+    tmpfs: ["/tmp:size=64m"]
+    networks: [traefik, internal]
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK:-traefik}
+      traefik.http.routers.tallymoth.rule: Host(`${TALLYMOTH_HOST:?set TALLYMOTH_HOST in .env}`) && (Path(`/v1/events`) || Path(`/v1/policy`) || Path(`/healthz`))
+      traefik.http.routers.tallymoth.entrypoints: websecure
+      traefik.http.routers.tallymoth.tls.certresolver: ${TRAEFIK_CERTRESOLVER:-letsencrypt}
+      traefik.http.services.tallymoth.loadbalancer.server.port: "8080"
+      # Port 8081 (query API, later) has NO router: Grafana joins the `internal` network and calls http://tallymoth:8081.
+      # Turn Traefik's access log off for this router: it would record client IPs.
+volumes: {data: {}}
+networks:
+  internal: {}
+  traefik: {name: "${TRAEFIK_NETWORK:-traefik}", external: true}

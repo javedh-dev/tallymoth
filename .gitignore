@@ -1,0 +1,25 @@
+# build / runtime
+/data/
+*.db
+*.db-wal
+*.db-shm
+*.bak
+/dist/
+.env
+
+# AI assistant files and planning scratch (not part of the project)
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+AGENTS.md
+GEMINI.md
+.cursor/
+.cursorrules
+.windsurf/
+.windsurfrules
+.aider*
+.github/copilot-instructions.md
+.continue/
+.planning/
+PLAN.md
+PONYTAIL-DEBT.md

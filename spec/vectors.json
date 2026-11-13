@@ -1,0 +1,45 @@
+{
+ "version": 1,
+ "note": "nonce = smallest decimal counter >= start whose sha256(msg) has >= bits leading zero bits; hmac_hex = HMAC-SHA256(secret, msg)",
+ "cases": [
+  {
+   "key_id": "k_test",
+   "secret": "tm_sk_test_secret",
+   "ts": "1763020800",
+   "body": "{\"events\":[{\"name\":\"active\"}]}",
+   "bits": 8,
+   "start": 0,
+   "nonce": "352",
+   "msg_hex": "76312e6b5f746573742e313736333032303830302e3335322e7b226576656e7473223a5b7b226e616d65223a22616374697665227d5d7d",
+   "sha256_hex": "00ea267f3c4e3f3c1709bf7132c8f2052f7ea94c20588bba059d2b1d87f5cfc8",
+   "zero_bits": 8,
+   "hmac_hex": "0000ac2a046f0231aabd836642ad818b64f1f9815bb31ae385a96df119407735"
+  },
+  {
+   "key_id": "k_test",
+   "secret": "tm_sk_test_secret",
+   "ts": "1763020800",
+   "body": "{\"events\":[{\"name\":\"active\"}]}",
+   "bits": 12,
+   "start": 0,
+   "nonce": "543",
+   "msg_hex": "76312e6b5f746573742e313736333032303830302e3534332e7b226576656e7473223a5b7b226e616d65223a22616374697665227d5d7d",
+   "sha256_hex": "0007395401a2623fc970c6faca40dfcabdf0d2a726c937334be33e1997716541",
+   "zero_bits": 13,
+   "hmac_hex": "7bc3ae3830604edf139c493911b840ed1c2e62ee19fbd2f1b59319204ddc5235"
+  },
+  {
+   "key_id": "k_other",
+   "secret": "tm_sk_test_secret",
+   "ts": "1700000000",
+   "body": "{\"context\":{\"v\":\"1.0\"},\"events\":[{\"name\":\"x\",\"props\":{\"n\":1}}]}",
+   "bits": 10,
+   "start": 0,
+   "nonce": "349",
+   "msg_hex": "76312e6b5f6f746865722e313730303030303030302e3334392e7b22636f6e74657874223a7b2276223a22312e30227d2c226576656e7473223a5b7b226e616d65223a2278222c2270726f7073223a7b226e223a317d7d5d7d",
+   "sha256_hex": "0006155c8633cd3be0c2605a9a3160b87725ef7387d95e2f2ba1f30487815ba4",
+   "zero_bits": 13,
+   "hmac_hex": "9388b1fd8819eb8c98af5d13f673c1e669aa8a467a678ac60e4a2297121d18e5"
+  }
+ ]
+}
