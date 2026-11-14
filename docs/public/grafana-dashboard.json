@@ -1,0 +1,725 @@
+{
+ "uid": "tallymoth",
+ "title": "tallymoth",
+ "tags": [
+  "tallymoth"
+ ],
+ "schemaVersion": 39,
+ "version": 1,
+ "editable": true,
+ "time": {
+  "from": "now-7d",
+  "to": "now"
+ },
+ "refresh": "30s",
+ "templating": {
+  "list": [
+   {
+    "name": "ds",
+    "label": "Datasource",
+    "type": "datasource",
+    "query": "yesoreyeram-infinity-datasource",
+    "current": {},
+    "hide": 0
+   }
+  ]
+ },
+ "panels": [
+  {
+   "id": 1,
+   "title": "Active events (range)",
+   "type": "stat",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "${ds}"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "${ds}"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "timeseries",
+     "url": "/v1/query?event=active&step=1h&from=${__from}&to=${__to}",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "rows",
+     "columns": [
+      {
+       "selector": "t",
+       "text": "Time",
+       "type": "timestamp_epoch"
+      },
+      {
+       "selector": "value",
+       "text": "Value",
+       "type": "number"
+      }
+     ],
+     "filters": []
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {}
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "sum"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "area",
+    "textMode": "value"
+   }
+  },
+  {
+   "id": 2,
+   "title": "Errors (range)",
+   "type": "stat",
+   "gridPos": {
+    "x": 6,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "${ds}"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "${ds}"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "timeseries",
+     "url": "/v1/query?event=error&step=1h&from=${__from}&to=${__to}",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "rows",
+     "columns": [
+      {
+       "selector": "t",
+       "text": "Time",
+       "type": "timestamp_epoch"
+      },
+      {
+       "selector": "value",
+       "text": "Value",
+       "type": "number"
+      }
+     ],
+     "filters": []
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {}
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "sum"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "area",
+    "textMode": "value"
+   }
+  },
+  {
+   "id": 3,
+   "title": "Brightness used (range)",
+   "type": "stat",
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "${ds}"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "${ds}"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "timeseries",
+     "url": "/v1/query?event=brightness_used&step=1h&from=${__from}&to=${__to}",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "rows",
+     "columns": [
+      {
+       "selector": "t",
+       "text": "Time",
+       "type": "timestamp_epoch"
+      },
+      {
+       "selector": "value",
+       "text": "Value",
+       "type": "number"
+      }
+     ],
+     "filters": []
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {}
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "sum"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "area",
+    "textMode": "value"
+   }
+  },
+  {
+   "id": 4,
+   "title": "Active events per day (avg)",
+   "type": "stat",
+   "gridPos": {
+    "x": 18,
+    "y": 0,
+    "w": 6,
+    "h": 4
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "${ds}"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "${ds}"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "timeseries",
+     "url": "/v1/query?event=active&step=1d&from=${__from}&to=${__to}",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "rows",
+     "columns": [
+      {
+       "selector": "t",
+       "text": "Time",
+       "type": "timestamp_epoch"
+      },
+      {
+       "selector": "value",
+       "text": "Value",
+       "type": "number"
+      }
+     ],
+     "filters": []
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {}
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "mean"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "area",
+    "textMode": "value"
+   }
+  },
+  {
+   "id": 5,
+   "title": "Active events / hour",
+   "type": "timeseries",
+   "gridPos": {
+    "x": 0,
+    "y": 4,
+    "w": 24,
+    "h": 7
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "${ds}"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "${ds}"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "timeseries",
+     "url": "/v1/query?event=active&step=1h&from=${__from}&to=${__to}",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "rows",
+     "columns": [
+      {
+       "selector": "t",
+       "text": "Time",
+       "type": "timestamp_epoch"
+      },
+      {
+       "selector": "value",
+       "text": "Value",
+       "type": "number"
+      }
+     ],
+     "filters": []
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "fillOpacity": 10,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "none"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "bottom",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   }
+  },
+  {
+   "id": 6,
+   "title": "Active by macOS version",
+   "type": "timeseries",
+   "gridPos": {
+    "x": 0,
+    "y": 11,
+    "w": 12,
+    "h": 8
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "${ds}"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "${ds}"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "table",
+     "url": "/v1/query?event=active&step=1h&from=${__from}&to=${__to}&group_by=os",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "rows",
+     "columns": [
+      {
+       "selector": "t",
+       "text": "Time",
+       "type": "timestamp_epoch"
+      },
+      {
+       "selector": "group",
+       "text": "os",
+       "type": "string"
+      },
+      {
+       "selector": "value",
+       "text": "Value",
+       "type": "number"
+      }
+     ],
+     "filters": []
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "fillOpacity": 25,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "bottom",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "transformations": [
+    {
+     "id": "partitionByValues",
+     "options": {
+      "fields": [
+       "os"
+      ],
+      "keepFields": false,
+      "naming": {
+       "asLabels": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "title": "Active by Mac model",
+   "type": "timeseries",
+   "gridPos": {
+    "x": 12,
+    "y": 11,
+    "w": 12,
+    "h": 8
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "${ds}"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "${ds}"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "table",
+     "url": "/v1/query?event=active&step=1h&from=${__from}&to=${__to}&group_by=model",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "rows",
+     "columns": [
+      {
+       "selector": "t",
+       "text": "Time",
+       "type": "timestamp_epoch"
+      },
+      {
+       "selector": "group",
+       "text": "model",
+       "type": "string"
+      },
+      {
+       "selector": "value",
+       "text": "Value",
+       "type": "number"
+      }
+     ],
+     "filters": []
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "fillOpacity": 25,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "bottom",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "transformations": [
+    {
+     "id": "partitionByValues",
+     "options": {
+      "fields": [
+       "model"
+      ],
+      "keepFields": false,
+      "naming": {
+       "asLabels": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "title": "Errors by kind",
+   "type": "timeseries",
+   "gridPos": {
+    "x": 0,
+    "y": 19,
+    "w": 12,
+    "h": 8
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "${ds}"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "${ds}"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "table",
+     "url": "/v1/query?event=error&step=1h&from=${__from}&to=${__to}&group_by=kind",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "rows",
+     "columns": [
+      {
+       "selector": "t",
+       "text": "Time",
+       "type": "timestamp_epoch"
+      },
+      {
+       "selector": "group",
+       "text": "kind",
+       "type": "string"
+      },
+      {
+       "selector": "value",
+       "text": "Value",
+       "type": "number"
+      }
+     ],
+     "filters": []
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "fillOpacity": 25,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "normal"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "bottom",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   },
+   "transformations": [
+    {
+     "id": "partitionByValues",
+     "options": {
+      "fields": [
+       "kind"
+      ],
+      "keepFields": false,
+      "naming": {
+       "asLabels": false
+      }
+     }
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "title": "Daily active events",
+   "type": "timeseries",
+   "gridPos": {
+    "x": 12,
+    "y": 19,
+    "w": 12,
+    "h": 8
+   },
+   "datasource": {
+    "type": "yesoreyeram-infinity-datasource",
+    "uid": "${ds}"
+   },
+   "targets": [
+    {
+     "refId": "A",
+     "datasource": {
+      "type": "yesoreyeram-infinity-datasource",
+      "uid": "${ds}"
+     },
+     "type": "json",
+     "source": "url",
+     "parser": "backend",
+     "format": "timeseries",
+     "url": "/v1/query?event=active&step=1d&from=${__from}&to=${__to}",
+     "url_options": {
+      "method": "GET",
+      "data": ""
+     },
+     "root_selector": "rows",
+     "columns": [
+      {
+       "selector": "t",
+       "text": "Time",
+       "type": "timestamp_epoch"
+      },
+      {
+       "selector": "value",
+       "text": "Value",
+       "type": "number"
+      }
+     ],
+     "filters": []
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short",
+     "custom": {
+      "drawStyle": "line",
+      "lineWidth": 2,
+      "fillOpacity": 10,
+      "showPoints": "never",
+      "stacking": {
+       "mode": "none"
+      }
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "legend": {
+     "displayMode": "table",
+     "placement": "bottom",
+     "calcs": [
+      "sum"
+     ]
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "desc"
+    }
+   }
+  }
+ ]
+}

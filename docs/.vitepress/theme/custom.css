@@ -1,0 +1,160 @@
+/* Vintage print: paper and ink by day, warm dark by night. Amber and navy come from the logo.
+   Text and headings are Noto Sans, code and diagrams JetBrains Mono. */
+:root {
+  --vp-font-family-base: 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --vp-font-family-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --tm-serif: var(--vp-font-family-base); /* one family for everything: Noto Sans */
+  --tm-ink: #2b2118;
+  --tm-amber: #f2b45a;
+  --tm-navy: #1e2a44;
+}
+
+:root {
+  --vp-c-bg: #f4ecd6;
+  --vp-c-bg-alt: #ece2c5;
+  --vp-c-bg-elv: #f4ecd6;
+  --vp-c-bg-soft: #e9dfc2;
+  --vp-c-text-1: var(--tm-ink);
+  --vp-c-text-2: #5a4a37;
+  --vp-c-text-3: #7d6b52;
+  --vp-c-divider: #c9ba93;
+  --vp-c-gutter: #d8cba6;
+  --vp-c-brand-1: #9c3f0c;   /* rust */
+  --vp-c-brand-2: #b34e12;
+  --vp-c-brand-3: var(--tm-amber);
+  --vp-c-brand-soft: rgba(156, 63, 12, 0.12);
+  --vp-button-brand-bg: var(--tm-amber);
+  --vp-button-brand-hover-bg: #f7c373;
+  --vp-button-brand-active-bg: #e5a23f;
+  --vp-button-brand-text: var(--tm-ink);
+  --vp-button-brand-hover-text: var(--tm-ink);
+  --vp-button-brand-active-text: var(--tm-ink);
+  --vp-button-brand-border: var(--tm-ink);
+  --vp-button-alt-bg: transparent;
+  --vp-button-alt-border: var(--tm-ink);
+  --vp-button-alt-text: var(--tm-ink);
+  --vp-button-alt-hover-bg: var(--vp-c-bg-soft);
+  --vp-button-alt-hover-text: var(--tm-ink);
+  --vp-home-hero-name-color: var(--tm-ink);
+  --vp-code-block-bg: #ebe0c0;
+  --vp-code-line-highlight-color: rgba(156, 63, 12, 0.1);
+  --vp-c-default-soft: #e3d8b8;
+}
+
+.dark {
+  --vp-c-bg: #15120d;
+  --vp-c-bg-alt: #110f0b;
+  --vp-c-bg-elv: #15120d;
+  --vp-c-bg-soft: #1f1a12;
+  --vp-c-text-1: #ecdfbd;
+  --vp-c-text-2: #b8a888;
+  --vp-c-text-3: #8a7c62;
+  --vp-c-divider: #3a3224;
+  --vp-c-gutter: #0e0c08;
+  --vp-c-brand-1: var(--tm-amber);
+  --vp-c-brand-2: #ffd08a;
+  --vp-c-brand-3: var(--tm-amber);
+  --vp-c-brand-soft: rgba(242, 180, 90, 0.14);
+  --vp-button-brand-border: var(--tm-amber);
+  --vp-button-alt-border: #5a4c33;
+  --vp-button-alt-text: var(--vp-c-text-1);
+  --vp-button-alt-hover-bg: #1f1a12;
+  --vp-button-alt-hover-text: var(--tm-amber);
+  --vp-home-hero-name-color: var(--tm-amber);
+  --vp-code-block-bg: #0f0d09;
+  --vp-c-default-soft: #241e14;
+}
+
+/* square corners, hairlines, no shadows */
+:root { --vp-border-radius: 0; }
+.vp-doc { font-size: 16px; line-height: 1.75; }
+.vp-doc div[class*='language-'], .vp-doc :not(pre) > code, .vp-doc table, .VPButton, .VPFeature, .VPLocalSearchBox .result,
+.vp-doc .custom-block { border-radius: 0 !important; box-shadow: none !important; }
+.vp-doc h1, .vp-doc h2, .vp-doc h3, .VPHomeHero .name, .VPHomeHero .text, .tm-steps h2 { font-family: var(--tm-serif); }
+.vp-doc h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+.vp-doc h2 { font-size: 24px; font-weight: 600; border-top: 1px solid var(--vp-c-divider); margin-top: 48px; padding-top: 24px; }
+.vp-doc h3 { font-size: 19px; font-weight: 600; }
+.vp-doc code, .vp-doc pre, .vp-doc kbd { font-family: var(--vp-font-family-mono); }
+.vp-doc :not(pre) > code { font-size: 0.86em; background: var(--vp-c-bg-soft); border: 1px solid var(--vp-c-divider); padding: 1px 5px; }
+.vp-doc div[class*='language-'] { border: 1px solid var(--vp-c-divider); }
+.vp-doc div[class*='language-'] code { font-size: 13.5px; line-height: 1.65; }
+.vp-doc table { display: block; max-width: 100%; overflow-x: auto; font-size: 15px; }
+.vp-doc th { background: var(--vp-c-bg-soft); font-weight: 600; }
+.vp-doc th, .vp-doc td { border: 1px solid var(--vp-c-divider); padding: 8px 12px; vertical-align: top; }
+.vp-doc tr, .vp-doc tr:nth-child(2n) { background: transparent; }
+.vp-doc a { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; font-weight: 500; }
+.VPNavBarTitle .title { font-family: var(--tm-serif); font-weight: 700; font-size: 18px; }
+.VPSidebarItem.level-0 > .item .text { text-transform: uppercase; letter-spacing: 0.08em; font-size: 12px; color: var(--vp-c-text-3); font-weight: 600; }
+.VPSidebarItem .text { font-size: 15px; }
+.VPNavBarMenuLink { font-weight: 500; }
+
+/* home */
+.VPHomeHero .name { font-size: 60px; font-weight: 700; letter-spacing: -0.02em; }
+.VPHomeHero .text { font-size: 30px; line-height: 1.25; font-weight: 600; color: var(--vp-c-text-1); max-width: 20em; }
+.VPHomeHero .tagline { font-size: 17px; line-height: 1.6; color: var(--vp-c-text-2); max-width: 36em; }
+.VPHomeHero .image-bg { display: none; }
+.VPHomeHero .image-src { border-radius: 0; max-width: 200px; border: 1px solid var(--vp-c-divider); }
+.VPButton { border-width: 1px !important; font-weight: 600; }
+@media (max-width: 640px) { .VPHomeHero .name { font-size: 44px; } .VPHomeHero .text { font-size: 24px; } }
+
+.VPFeature { background: transparent !important; border: 1px solid var(--vp-c-divider) !important; }
+.VPFeature:hover { border-color: var(--vp-c-brand-1) !important; }
+.VPFeature .title { font-family: var(--tm-serif); font-size: 18px; font-weight: 600; }
+.VPFeature .details { font-size: 15px; line-height: 1.6; color: var(--vp-c-text-2); }
+
+.tm-steps { max-width: 1152px; margin: 0 auto; padding: 48px 24px 24px; }
+.tm-steps h2 { border: 0; margin: 0 0 16px; padding: 0; font-size: 26px; font-weight: 600; }
+.tm-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.tm-cols h3 { margin: 0 0 8px; font-size: 16px; font-weight: 600; }
+.tm-cols div[class*='language-'] { margin: 0 0 12px; border: 1px solid var(--vp-c-divider); }
+@media (max-width: 800px) { .tm-cols { grid-template-columns: 1fr; } }
+
+/* keep header and field names in the first column on one line */
+.vp-doc td:first-child code { white-space: nowrap; }
+
+/* keep code aligned: no ligatures turning -> into one glyph */
+.vp-doc code, .vp-doc pre { font-variant-ligatures: none; }
+
+/* Mermaid diagrams use the site colours and JetBrains Mono, so they follow light and dark mode */
+.mermaid { margin: 24px 0; display: flex; justify-content: center; font-family: var(--vp-font-family-mono); font-size: 13px; }
+.mermaid svg { max-width: 100%; height: auto; font-family: var(--vp-font-family-mono) !important; }
+.mermaid .node rect, .mermaid .node polygon, .mermaid .node path, .mermaid .node ellipse, .mermaid .node circle,
+.mermaid rect.actor, .mermaid .actor { fill: var(--vp-c-bg-soft) !important; stroke: var(--vp-c-divider) !important; stroke-width: 1.5px !important; }
+.mermaid .node rect, .mermaid rect.actor { rx: 10px; ry: 10px; }
+.mermaid .cluster rect { fill: transparent !important; stroke: var(--vp-c-divider) !important; stroke-dasharray: 4 4; rx: 12px; ry: 12px; }
+.mermaid text, .mermaid .nodeLabel, .mermaid .label, .mermaid .cluster-label, .mermaid .messageText, .mermaid .noteText, .mermaid span, .mermaid p {
+  fill: var(--vp-c-text-1) !important; color: var(--vp-c-text-1) !important; font-family: var(--vp-font-family-mono) !important; font-size: 13px; }
+.mermaid .edgeLabel, .mermaid .edgeLabel p, .mermaid .edgeLabel span, .mermaid .edgeLabel rect { background-color: var(--vp-c-bg) !important; fill: var(--vp-c-bg) !important; }
+.mermaid .edgeLabel span, .mermaid .edgeLabel p { color: var(--vp-c-text-2) !important; font-size: 12px; }
+.mermaid .flowchart-link, .mermaid .messageLine0, .mermaid .messageLine1, .mermaid .actor-line { stroke: var(--vp-c-text-3) !important; stroke-width: 1.5px !important; }
+.mermaid .marker, .mermaid #arrowhead path { fill: var(--vp-c-text-3) !important; stroke: var(--vp-c-text-3) !important; }
+.mermaid .note { fill: var(--vp-c-brand-soft) !important; stroke: var(--vp-c-brand-1) !important; rx: 8px; ry: 8px; }
+.mermaid .labelBox { fill: var(--vp-c-bg-soft) !important; stroke: var(--vp-c-divider) !important; }
+
+/* the doc's paragraph styles (tall lines, margins) must not leak into diagram labels, or they overflow their boxes */
+.mermaid p, .mermaid span, .mermaid div, .mermaid foreignObject div { margin: 0 !important; line-height: 1.45 !important; }
+.mermaid .nodeLabel p, .mermaid .edgeLabel p, .mermaid .cluster-label p { margin: 0 !important; text-align: center; }
+
+/* click a diagram to enlarge it */
+.mermaid { position: relative; cursor: zoom-in; border: 1px solid var(--vp-c-divider); padding: 16px; }
+.mermaid:hover, .mermaid:focus-visible { border-color: var(--vp-c-brand-1); outline: none; }
+.mermaid::after {
+  content: 'Click to enlarge'; position: absolute; top: 8px; right: 10px;
+  font: 500 11px/1 var(--vp-font-family-base); color: var(--vp-c-text-3);
+  opacity: 0; transition: opacity 0.15s;
+}
+.mermaid:hover::after, .mermaid:focus-visible::after { opacity: 1; }
+
+.tm-zoom { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center;
+  background: rgba(15, 12, 8, 0.72); padding: 24px; cursor: zoom-out; }
+.tm-zoom-card { position: relative; background: var(--vp-c-bg); border: 1px solid var(--vp-c-divider);
+  width: min(1100px, 100%); max-height: 100%; overflow: auto; padding: 40px 32px 28px; cursor: default; }
+.tm-zoom-card svg { display: block; margin: 0 auto; font-family: var(--vp-font-family-mono) !important; }
+.tm-zoom-close { position: absolute; top: 6px; right: 10px; width: 32px; height: 32px; border: 0; background: transparent;
+  color: var(--vp-c-text-2); font: 400 26px/1 var(--vp-font-family-base); cursor: pointer; }
+.tm-zoom-close:hover, .tm-zoom-close:focus-visible { color: var(--vp-c-brand-1); outline: none; }
+body.tm-zoom-open { overflow: hidden; }
+
+.tm-zoom-card .mermaid { cursor: default; border: 0; padding: 0; margin: 0; }
+.tm-zoom-card .mermaid::after { content: none; }
+.tm-zoom-card .mermaid svg { margin: 0 auto; }
