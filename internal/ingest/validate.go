@@ -2,7 +2,6 @@ package ingest
 
 import (
 	"encoding/json"
-	"regexp"
 	"time"
 
 	"github.com/javedh-dev/tallymoth/internal/config"
@@ -14,11 +13,6 @@ const (
 	maxValueLen      = 256
 	maxBackdate      = 7 * 24 * time.Hour
 	maxFuture        = 5 * time.Minute
-)
-
-var (
-	nameRe = regexp.MustCompile(`^[a-z][a-z0-9_.]{0,47}$`)
-	propRe = regexp.MustCompile(`^[a-z][a-z0-9_]{0,31}$`)
 )
 
 type envelope struct {
@@ -53,7 +47,7 @@ func validate(t *config.Tenant, env *envelope, now time.Time) (ok []store.Event,
 			for _, p := range list {
 				allowed[p] = true
 			}
-		} else if !nameRe.MatchString(e.Name) {
+		} else if !config.NameRe.MatchString(e.Name) {
 			reject("invalid_event_name")
 			continue
 		}
@@ -74,7 +68,7 @@ func validate(t *config.Tenant, env *envelope, now time.Time) (ok []store.Event,
 					dropped["unknown_prop"]++
 					continue
 				}
-				if !propRe.MatchString(k) || !scalar(v) {
+				if !config.PropRe.MatchString(k) || !scalar(v) {
 					bad = "invalid_prop"
 					continue
 				}

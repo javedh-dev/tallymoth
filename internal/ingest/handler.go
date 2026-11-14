@@ -1,4 +1,4 @@
-// Package ingest is the public HTTP side: POST /v1/events, GET /v1/policy.
+// Package ingest is the public HTTP side: POST /v1/events.
 package ingest
 
 import (
@@ -24,10 +24,9 @@ type Handler struct {
 	Limit  *limit.IP
 }
 
-func (h *Handler) Register(mux *http.ServeMux, version string) {
+func (h *Handler) Register(mux *http.ServeMux) {
 	mux.HandleFunc("POST /v1/events", h.events)
 	mux.HandleFunc("OPTIONS /v1/events", h.preflight)
-	mux.HandleFunc("GET /v1/policy", func(w http.ResponseWriter, r *http.Request) { h.policy(w, r, version) })
 }
 
 func reply(w http.ResponseWriter, code int, v any) {

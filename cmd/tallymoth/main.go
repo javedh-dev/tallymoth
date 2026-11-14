@@ -21,6 +21,7 @@ var version = "dev" // set with -ldflags "-X main.version=..."
 
 const usage = `usage: tallymoth <command>
   serve [--config FILE]       run the server (default config: /config/tallymoth.yaml)
+  serve --demo                built-in demo tenant with synthetic data, for trying Grafana
   config validate [FILE]      check a config file without starting
   keygen [write|read|signed]  generate a key (default: write)
   healthcheck                 exit 0 if the local server answers /healthz
@@ -35,11 +36,11 @@ func main() {
 	var err error
 	switch args[0] {
 	case "serve":
-		path := "/config/tallymoth.yaml"
+		path, demo := "/config/tallymoth.yaml", len(args) == 2 && args[1] == "--demo"
 		if len(args) == 3 && args[1] == "--config" {
 			path = args[2]
 		}
-		err = serve(path)
+		err = serve(path, demo)
 	case "config":
 		if len(args) < 2 || args[1] != "validate" {
 			err = fmt.Errorf("usage: tallymoth config validate [FILE]")

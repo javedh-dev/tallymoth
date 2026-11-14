@@ -1,0 +1,11 @@
+apiVersion: 1
+datasources:
+  - name: tallymoth
+    uid: tallymoth
+    type: yesoreyeram-infinity-datasource
+    access: proxy
+    url: http://tallymoth:8081
+    jsonData:
+      auth_method: bearerToken
+      allowedHosts: ["http://tallymoth:8081"]
+    secureJsonData: {bearerToken: demo-read}

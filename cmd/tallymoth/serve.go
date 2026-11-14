@@ -14,11 +14,16 @@ import (
 	"github.com/javedh-dev/tallymoth/internal/config"
 	"github.com/javedh-dev/tallymoth/internal/ingest"
 	"github.com/javedh-dev/tallymoth/internal/limit"
+	"github.com/javedh-dev/tallymoth/internal/query"
 	"github.com/javedh-dev/tallymoth/internal/store"
 )
 
-func serve(path string) error {
-	cfg, err := config.Load(path)
+func serve(path string, demo bool) error {
+	load := func() (*config.Config, error) { return config.Load(path) }
+	if demo {
+		load = demoConfig
+	}
+	cfg, err := load()
 	if err != nil {
 		return err
 	}
@@ -40,9 +45,10 @@ func serve(path string) error {
 
 	public := http.NewServeMux()
 	public.HandleFunc("GET /healthz", healthz)
-	h.Register(public, version)
-	private := http.NewServeMux() // query API arrives in M2; keep it off the public port
+	h.Register(public)
+	private := http.NewServeMux() // read-key API, kept off the public port
 	private.HandleFunc("GET /healthz", healthz)
+	query.New(&current, stores).Register(private)
 
 	servers := []*http.Server{newServer(cfg.Server.Listen.Public, public), newServer(cfg.Server.Listen.Private, private)}
 	for _, s := range servers {
@@ -56,12 +62,16 @@ func serve(path string) error {
 	slog.Info("tallymoth started", "version", version, "public", cfg.Server.Listen.Public, "private", cfg.Server.Listen.Private, "tenants", len(cfg.Tenants))
 
 	go pruneLoop(&current, stores)
+	if demo {
+		slog.Warn("DEMO MODE: synthetic data, public keys demo-write / demo-read. Never expose this.")
+		go demoSeed(stores.Get("demo"))
+	}
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	for s := range sig {
 		if s == syscall.SIGHUP {
-			next, err := config.Load(path)
+			next, err := load()
 			if err != nil {
 				slog.Error("reload rejected, keeping old config", "err", err)
 				continue

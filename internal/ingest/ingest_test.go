@@ -72,7 +72,7 @@ func setup(t *testing.T) *env {
 	cur.Store(cfg)
 	h := &ingest.Handler{Config: &cur, Stores: stores, Replay: auth.NewReplay(), Limit: limit.NewIP()}
 	mux := http.NewServeMux()
-	h.Register(mux, "test")
+	h.Register(mux)
 	srv := httptest.NewServer(mux)
 	t.Cleanup(func() { srv.Close(); stores.Close() })
 	return &env{srv, dir, stores, logs}
@@ -230,24 +230,6 @@ func TestLimitsAndOrigin(t *testing.T) {
 	h["Origin"] = "https://example.com"
 	if code, _, hd := e.post(t, body, h); code != 202 || hd.Get("Access-Control-Allow-Origin") != "https://example.com" {
 		t.Errorf("allowed origin: %d %v", code, hd)
-	}
-}
-
-func TestPolicy(t *testing.T) {
-	e := setup(t)
-	resp, _ := http.Get(e.srv.URL + "/v1/policy?tenant=app")
-	b, _ := io.ReadAll(resp.Body)
-	s := string(b)
-	for _, want := range []string{`"ip_address":false`, `"user_agent":false`, `"active":["version","cores"]`} {
-		if !strings.Contains(s, want) {
-			t.Errorf("policy missing %s: %s", want, s)
-		}
-	}
-	if strings.Contains(s, "s3cret") || strings.Contains(s, "k_app") {
-		t.Error("policy must not leak keys")
-	}
-	if r, _ := http.Get(e.srv.URL + "/v1/policy?tenant=zzz"); r.StatusCode != 404 {
-		t.Errorf("unknown tenant: %d", r.StatusCode)
 	}
 }
 

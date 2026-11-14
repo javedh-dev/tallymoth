@@ -1,5 +1,5 @@
 // Package auth verifies "signed" requests: fresh timestamp, proof of work, HMAC, single use.
-// The wire format is spec/PROTOCOL.md; spec/vectors.json is the cross-language truth.
+// The wire format is docs/send-events.md and docs/signing.md; spec/vectors.json is the cross-language truth.
 package auth
 
 import (

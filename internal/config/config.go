@@ -34,11 +34,8 @@ type Server struct {
 }
 
 type Tenant struct {
-	ID               string
-	Name             string
-	Purpose          string
-	PrivacyPolicyURL string `yaml:"privacy_policy_url"`
-	Auth             struct {
+	ID   string
+	Auth struct {
 		Mode    string // "signed" or "bearer"
 		PowBits int    `yaml:"pow_bits"`
 	}
@@ -80,11 +77,13 @@ type file struct {
 	Tenants  []yaml.Node
 }
 
+// NameRe and PropRe are the allowed event names and prop keys everywhere (config, ingest, query).
 var (
+	NameRe = regexp.MustCompile(`^[a-z][a-z0-9_.]{0,47}$`)
+	PropRe = regexp.MustCompile(`^[a-z][a-z0-9_]{0,31}$`)
+
 	idRe    = regexp.MustCompile(`^[a-z0-9-]{2,32}$`)
 	envVar  = regexp.MustCompile(`\$\{([A-Za-z_][A-Za-z0-9_]*)\}`)
-	nameRe  = regexp.MustCompile(`^[a-z][a-z0-9_.]{0,47}$`)
-	propRe  = regexp.MustCompile(`^[a-z][a-z0-9_]{0,31}$`)
 	keyIDRe = regexp.MustCompile(`^[A-Za-z0-9_-]{1,32}$`)
 )
 
@@ -254,12 +253,12 @@ func (t *Tenant) validate() error {
 		return fmt.Errorf("strict schema needs an events: allowlist (nothing would be stored)")
 	}
 	for name, props := range t.Events {
-		if !nameRe.MatchString(name) {
-			return fmt.Errorf("event name %q must match %s", name, nameRe)
+		if !NameRe.MatchString(name) {
+			return fmt.Errorf("event name %q must match %s", name, NameRe)
 		}
 		for _, p := range props {
-			if !propRe.MatchString(p) {
-				return fmt.Errorf("event %q: prop %q must match %s", name, p, propRe)
+			if !PropRe.MatchString(p) {
+				return fmt.Errorf("event %q: prop %q must match %s", name, p, PropRe)
 			}
 		}
 	}

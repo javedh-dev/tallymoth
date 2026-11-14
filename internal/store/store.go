@@ -28,6 +28,7 @@ const (
 	queueSize  = 1024 // batches waiting for the writer
 	pruneChunk = 5000
 	msPerDay   = 86_400_000
+	msPerHour  = 3_600_000
 )
 
 type Event struct {
@@ -37,7 +38,8 @@ type Event struct {
 }
 
 type DB struct {
-	sql  *sql.DB
+	sql  *sql.DB // the single writer connection
+	read *sql.DB // read-only pool for the query API
 	path string
 	in   chan []Event
 	done chan struct{}
@@ -57,17 +59,22 @@ func Open(dir string) (*DB, error) {
 	}
 	path := filepath.Join(dir, "events.db")
 	// auto_vacuum must come first: it only takes effect on a brand-new file.
-	dsn := "file:" + path + "?_pragma=auto_vacuum(2)&_pragma=journal_mode(WAL)&_pragma=synchronous(NORMAL)&_pragma=busy_timeout(5000)&_pragma=cache_size(-2000)"
+	dsn := "file:" + path + "?_pragma=auto_vacuum(2)&_pragma=journal_mode(WAL)&_pragma=synchronous(NORMAL)&_pragma=temp_store(2)&_pragma=busy_timeout(5000)&_pragma=cache_size(-2000)"
 	sdb, err := sql.Open("sqlite", dsn)
 	if err != nil {
 		return nil, err
 	}
-	sdb.SetMaxOpenConns(1) // ponytail: one connection; add a read-only pool for the query API in M2
+	sdb.SetMaxOpenConns(1)
 	if err := migrate(sdb, path); err != nil {
 		sdb.Close()
 		return nil, err
 	}
-	d := &DB{sql: sdb, path: path, in: make(chan []Event, queueSize), done: make(chan struct{})}
+	rdb, err := openReader(path)
+	if err != nil {
+		sdb.Close()
+		return nil, err
+	}
+	d := &DB{sql: sdb, read: rdb, path: path, in: make(chan []Event, queueSize), done: make(chan struct{})}
 	d.day = time.Now().UnixMilli() / msPerDay
 	sdb.QueryRow("SELECT count(*) FROM events WHERE ts >= ?", d.day*msPerDay).Scan(&d.today)
 	d.measure()
@@ -135,7 +142,12 @@ func (d *DB) insert(evs []Event) {
 		slog.Error("store: begin", "err", err, "lost_events", len(evs))
 		return
 	}
-	stmt, err := tx.Prepare("INSERT INTO events (ts, name, props) VALUES (?, ?, ?)")
+	var last int64
+	err = tx.QueryRow("SELECT coalesce(max(id), 0) FROM events").Scan(&last)
+	var stmt *sql.Stmt
+	if err == nil {
+		stmt, err = tx.Prepare("INSERT INTO events (ts, name, props) VALUES (?, ?, ?)")
+	}
 	if err == nil {
 		for _, e := range evs {
 			if _, err = stmt.Exec(e.TS, e.Name, e.Props); err != nil {
@@ -143,6 +155,9 @@ func (d *DB) insert(evs []Event) {
 			}
 		}
 		stmt.Close()
+	}
+	if err == nil {
+		err = rollup(tx, last)
 	}
 	if err == nil {
 		err = tx.Commit()
@@ -182,6 +197,9 @@ func (d *DB) Prune(days int) error {
 		}
 		time.Sleep(50 * time.Millisecond)
 	}
+	if _, err := d.sql.Exec("DELETE FROM rollup WHERE h + ? <= ?", msPerHour, cutoff); err != nil {
+		return err
+	}
 	_, err := d.sql.Exec("PRAGMA incremental_vacuum(2000)")
 	d.measure()
 	return err
@@ -194,6 +212,7 @@ func (d *DB) Close() error {
 	close(d.in)
 	d.mu.Unlock()
 	<-d.done
+	d.read.Close()
 	d.sql.Exec("PRAGMA wal_checkpoint(TRUNCATE)")
 	return d.sql.Close()
 }

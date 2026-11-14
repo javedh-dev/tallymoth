@@ -1,0 +1,19 @@
+# Try tallymoth + Grafana with synthetic data:  docker compose -f deploy/demo/docker-compose.yml up --build
+# Grafana: http://localhost:3000 (anonymous admin)   tallymoth: :8080 ingest, :8081 query. Local testing only.
+services:
+  tallymoth:
+    build: {context: ../.., dockerfile: deploy/Dockerfile}
+    command: ["serve", "--demo"]
+    ports: ["127.0.0.1:8080:8080", "127.0.0.1:8081:8081"]
+  grafana:
+    image: grafana/grafana:latest
+    depends_on: [tallymoth]
+    ports: ["127.0.0.1:3000:3000"]
+    environment:
+      GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /var/lib/grafana/dashboards/tallymoth.json
+    volumes:
+      - ./provisioning:/etc/grafana/provisioning:ro
+      - ./dashboards:/var/lib/grafana/dashboards:ro

@@ -12,8 +12,6 @@ defaults:
 tenants:
   # A public app that ships its key (see examples/scalebar/tenant.yaml for a fuller one).
   - id: scalebar
-    purpose: "Daily active count, feature usage and compatibility data for the ScaleBar macOS app."
-    privacy_policy_url: https://github.com/javedh-dev/ScaleBar/blob/main/PRIVACY.md
     keys:
       - {id: k_scalebar1, secret: "${SCALEBAR_KEY}"}    # `tallymoth keygen signed` makes one
     retention_days: 180
