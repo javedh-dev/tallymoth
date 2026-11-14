@@ -1,6 +1,6 @@
 # Docker Compose guide
 
-A complete setup you can copy: tallymoth, Caddy for HTTPS, and optionally Grafana. For the reasoning behind the settings and other proxies, see [Docker and reverse proxy](/docker).
+The smallest setup that runs tallymoth with Compose. HTTPS and Grafana are up to you: see [Docker and reverse proxy](/docker) and [Grafana](/grafana).
 
 You need Docker with the Compose plugin (`docker compose version`). Nothing is cloned: the image comes from `ghcr.io/javedh-dev/tallymoth`.
 
@@ -10,7 +10,6 @@ You need Docker with the Compose plugin (`docker compose version`). Nothing is c
 tallymoth/
   compose.yaml
   .env
-  Caddyfile
   config/
     tallymoth.yaml
 ```
@@ -33,40 +32,21 @@ services:
     stop_grace_period: 20s
     environment:
       TALLYMOTH_TRUST_PROXY: "1"       # client IP from X-Forwarded-For (rate limiting only, never stored)
-      TALLYMOTH_TRUSTED_HOPS: "1"      # one proxy (Caddy) in front
+      TALLYMOTH_TRUSTED_HOPS: "1"      # proxies in front of the container
       GOMEMLIMIT: 100MiB
       APP_KEY: ${APP_KEY}              # referenced as ${APP_KEY} in config/tallymoth.yaml
+    ports:
+      - "127.0.0.1:8080:8080"          # public port; use "8080:8080" if your proxy is on another machine
     volumes:
       - data:/data
       - ./config:/config:ro
     tmpfs: ["/tmp:size=64m"]
-    # no "ports:" - only Caddy (and Grafana) reach it, over the compose network
-
-  caddy:
-    image: caddy:2
-    restart: unless-stopped
-    ports: ["80:80", "443:443"]
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-    depends_on: [tallymoth]
-
-  # Optional: delete this block if you do not use Grafana
-  grafana:
-    image: grafana/grafana:latest
-    restart: unless-stopped
-    environment:
-      GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource
-    ports: ["127.0.0.1:3000:3000"]
-    volumes: [grafana:/var/lib/grafana]
 
 volumes:
   data:
-  caddy_data:
-  grafana:
 ```
 
-The tallymoth container is read-only, has no extra privileges, runs as a non-root user and is limited to 128 MB. Port 8081 (the query API) is never published.
+The container is read-only, has no extra privileges, runs as a non-root user and is limited to 128 MB. Port 8081 (the query API) is not published.
 
 ## 3. `.env`
 
@@ -106,47 +86,20 @@ tenants:
       error: [version, os, kind]
 ```
 
-## 5. `Caddyfile`
-
-Replace `events.example.com` with your domain and point its DNS record at this host. Caddy gets its own certificate.
-
-```text
-events.example.com {
-    log {
-        output discard
-    }
-    handle /v1/events {
-        reverse_proxy tallymoth:8080
-    }
-    handle /healthz {
-        reverse_proxy tallymoth:8080
-    }
-    handle {
-        respond 404
-    }
-}
-```
-
-No domain yet, or testing on one machine? Use `:80 {` in place of the domain line to serve plain HTTP.
-
-## 6. Start
+## 5. Start
 
 ```sh
 docker compose run --rm tallymoth config validate
 docker compose up -d
 docker compose ps
-curl https://events.example.com/healthz
+curl http://127.0.0.1:8080/healthz
 ```
 
 ```text
 ok
 ```
 
-`docker compose ps` should show tallymoth as `healthy`. Then send a test event ([Send events](/send-events)).
-
-## Grafana
-
-Grafana reaches the query API over the compose network. In the data source use `http://tallymoth:8081` and a read key. Follow [Grafana](/grafana) for the rest.
+`docker compose ps` should show `healthy`. Then send a test event ([Send events](/send-events)).
 
 ## Day-to-day
 
@@ -163,21 +116,4 @@ Grafana reaches the query API over the compose network. In the data source use `
 
 ## Back up
 
-Compose names the volume `<folder>_data`; for a folder called `tallymoth` that is `tallymoth_data` (check with `docker volume ls`):
-
-```sh
-docker run --rm -v tallymoth_data:/data -v $PWD/backup:/backup alpine \
-  sh -c 'apk add --no-cache sqlite >/dev/null && sqlite3 /data/myapp/events.db ".backup /backup/myapp.db"'
-```
-
-Replace `myapp` with your tenant id. More on [Upgrades and backups](/maintenance).
-
-## Try the demo
-
-To see everything working with synthetic data and no config, clone the repository and run:
-
-```sh
-docker compose -f examples/demo/docker-compose.yml up --build
-```
-
-Open `http://localhost:3000` for Grafana. The demo publishes both ports and gives anonymous admin access, so use it for local testing only.
+Compose names the volume `<folder>_data`; for a folder called `tallymoth` that is `tallymoth_data` (check with `docker volume ls`). See [Upgrades and backups](/maintenance) for the backup command.
