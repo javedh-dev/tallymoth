@@ -180,4 +180,4 @@ To see everything working with synthetic data and no config, clone the repositor
 docker compose -f examples/demo/docker-compose.yml up --build
 ```
 
-Open <http://localhost:3000> for Grafana. The demo publishes both ports and gives anonymous admin access, so use it for local testing only.
+Open `http://localhost:3000` for Grafana. The demo publishes both ports and gives anonymous admin access, so use it for local testing only.
