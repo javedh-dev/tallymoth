@@ -21,7 +21,7 @@ export default withMermaid(defineConfig({
       { text: 'Quick start', link: '/quick-start' },
       { text: 'Send events', link: '/send-events', activeMatch: '/send-events|/authentication|/signing' },
       { text: 'Query', link: '/query', activeMatch: '/query|/grafana' },
-      { text: 'Run it', link: '/configuration', activeMatch: '/configuration|/docker|/maintenance|/performance|/data-controls' },
+      { text: 'Run it', link: '/configuration', activeMatch: '/configuration|/docker|/docker-compose|/maintenance|/performance|/data-controls' },
       { text: 'Reference', link: '/errors', activeMatch: '/errors|/cli' },
       { text: 'Developers', link: '/architecture', activeMatch: '/architecture|/testing|/releasing' },
     ],
@@ -52,6 +52,7 @@ export default withMermaid(defineConfig({
         text: 'Running tallymoth',
         items: [
           { text: 'Configuration', link: '/configuration' },
+          { text: 'Docker Compose guide', link: '/docker-compose' },
           { text: 'Docker and reverse proxy', link: '/docker' },
           { text: 'Upgrades and backups', link: '/maintenance' },
           { text: 'Performance', link: '/performance' },
