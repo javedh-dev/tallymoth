@@ -1,60 +1,47 @@
 # Docker Compose guide
 
-A step-by-step setup with Compose: tallymoth, optionally a Caddy proxy for HTTPS, and optionally Grafana. For the reasoning behind the settings and other proxies, see [Docker and reverse proxy](/docker).
+A complete setup you can copy: tallymoth, Caddy for HTTPS, and optionally Grafana. For the reasoning behind the settings and other proxies, see [Docker and reverse proxy](/docker).
 
-You need Docker with the Compose plugin (`docker compose version`).
+You need Docker with the Compose plugin (`docker compose version`). Nothing is cloned: the image comes from `ghcr.io/javedh-dev/tallymoth`.
 
-## 1. Get the files
-
-```sh
-git clone https://github.com/javedh-dev/tallymoth.git
-cd tallymoth/deploy
-cp .env.example .env
-```
-
-## 2. Configure
-
-Create a key and put it in `.env`:
-
-```sh
-docker run --rm ghcr.io/javedh-dev/tallymoth keygen signed
-```
-
-```sh
-# .env
-SCALEBAR_KEY=<the secret it printed>
-```
-
-Then edit `config/tallymoth.yaml` for your own tenants. The sample reads `${SCALEBAR_KEY}`, and the compose file passes that variable in. If you rename it, rename it in both places. See [Configuration](/configuration).
-
-Check the config before starting:
-
-```sh
-docker compose run --rm tallymoth config validate
-```
-
-## 3. Start
-
-```sh
-docker compose up -d
-docker compose ps        # STATUS should become "healthy"
-curl http://127.0.0.1:8080/healthz
-```
+## 1. Make a folder
 
 ```text
-ok
+tallymoth/
+  compose.yaml
+  .env
+  Caddyfile
+  config/
+    tallymoth.yaml
 ```
 
-The container is read-only, has no extra privileges, runs as a non-root user and is limited to 128 MB. Only port 8080 is published, and only on `127.0.0.1`. Port 8081 (the query API) is not published.
+```sh
+mkdir -p tallymoth/config && cd tallymoth
+```
 
-## 4. Add HTTPS with Caddy
-
-Add Caddy to `deploy/docker-compose.yml` in the same file, so both share a network:
+## 2. `compose.yaml`
 
 ```yaml
 services:
   tallymoth:
-    # ... as before; remove the "ports:" entry, Caddy reaches it by name
+    image: ghcr.io/javedh-dev/tallymoth:${TALLYMOTH_VERSION:-latest}
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    stop_grace_period: 20s
+    environment:
+      TALLYMOTH_TRUST_PROXY: "1"       # client IP from X-Forwarded-For (rate limiting only, never stored)
+      TALLYMOTH_TRUSTED_HOPS: "1"      # one proxy (Caddy) in front
+      GOMEMLIMIT: 100MiB
+      APP_KEY: ${APP_KEY}              # referenced as ${APP_KEY} in config/tallymoth.yaml
+    volumes:
+      - data:/data
+      - ./config:/config:ro
+    tmpfs: ["/tmp:size=64m"]
+    # no "ports:" - only Caddy (and Grafana) reach it, over the compose network
+
   caddy:
     image: caddy:2
     restart: unless-stopped
@@ -62,12 +49,66 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
+    depends_on: [tallymoth]
+
+  # Optional: delete this block if you do not use Grafana
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    environment:
+      GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource
+    ports: ["127.0.0.1:3000:3000"]
+    volumes: [grafana:/var/lib/grafana]
+
 volumes:
-  data: {}
-  caddy_data: {}
+  data:
+  caddy_data:
+  grafana:
 ```
 
-`deploy/Caddyfile`:
+The tallymoth container is read-only, has no extra privileges, runs as a non-root user and is limited to 128 MB. Port 8081 (the query API) is never published.
+
+## 3. `.env`
+
+Make a key and put it here:
+
+```sh
+docker run --rm ghcr.io/javedh-dev/tallymoth keygen signed
+```
+
+```sh
+# .env
+APP_KEY=<the secret it printed>
+# TALLYMOTH_VERSION=1.2.3     # pin a version instead of "latest"
+```
+
+## 4. `config/tallymoth.yaml`
+
+A minimal config with one public app. The full example is [`examples/tallymoth.yaml`](https://github.com/javedh-dev/tallymoth/blob/main/examples/tallymoth.yaml), and every option is on [Configuration](/configuration).
+
+```yaml
+version: 1
+server:
+  listen: {public: ":8080", private: ":8081"}
+  data_dir: /data
+
+defaults:
+  auth: {mode: signed, pow_bits: 16}
+  limits: {max_body_bytes: 32768, max_batch_events: 50, ip_per_minute: 30, daily_cap: 1000000, max_db_mb: 2048}
+  retention_days: 90
+
+tenants:
+  - id: myapp
+    keys:
+      - {id: k_myapp1, secret: "${APP_KEY}"}
+    events:
+      active: [version, os]
+      error: [version, os, kind]
+```
+
+## 5. `Caddyfile`
+
+Replace `events.example.com` with your domain and point its DNS record at this host. Caddy gets its own certificate.
 
 ```text
 events.example.com {
@@ -86,23 +127,26 @@ events.example.com {
 }
 ```
 
-Point your DNS record at the host, then `docker compose up -d`. Caddy gets its own certificate. `TALLYMOTH_TRUSTED_HOPS` stays `1` because there is one proxy.
+No domain yet, or testing on one machine? Use `:80 {` in place of the domain line to serve plain HTTP.
 
-## 5. Add Grafana
+## 6. Start
 
-Put Grafana in the same compose file. Publish nothing for tallymoth's port 8081; Grafana reaches it over the compose network at `http://tallymoth:8081`:
-
-```yaml
-  grafana:
-    image: grafana/grafana:latest
-    restart: unless-stopped
-    environment:
-      GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource
-    ports: ["127.0.0.1:3000:3000"]
-    volumes: [grafana:/var/lib/grafana]
+```sh
+docker compose run --rm tallymoth config validate
+docker compose up -d
+docker compose ps
+curl https://events.example.com/healthz
 ```
 
-Add `grafana: {}` under `volumes:`. Then follow [Grafana](/grafana), using the URL above and a read key.
+```text
+ok
+```
+
+`docker compose ps` should show tallymoth as `healthy`. Then send a test event ([Send events](/send-events)).
+
+## Grafana
+
+Grafana reaches the query API over the compose network. In the data source use `http://tallymoth:8081` and a read key. Follow [Grafana](/grafana) for the rest.
 
 ## Day-to-day
 
@@ -110,9 +154,8 @@ Add `grafana: {}` under `volumes:`. Then follow [Grafana](/grafana), using the U
 |---|---|
 | Logs | `docker compose logs -f tallymoth` |
 | Reload config (no restart) | `docker compose kill -s HUP tallymoth` |
-| Stop | `docker compose down` (keeps the data volume) |
-| Upgrade | `TALLYMOTH_VERSION=1.2.3 docker compose up -d` (or edit `.env`), after reading the [changelog](https://github.com/javedh-dev/tallymoth/blob/main/CHANGELOG.md) |
-| Build from source | `docker compose up -d --build` |
+| Upgrade | set `TALLYMOTH_VERSION` in `.env`, then `docker compose pull && docker compose up -d` (read the [changelog](https://github.com/javedh-dev/tallymoth/blob/main/CHANGELOG.md) first) |
+| Stop | `docker compose down` (keeps the data) |
 
 ::: warning
 `docker compose down -v` deletes the data volume. Never use `-v` on a real deployment.
@@ -120,21 +163,21 @@ Add `grafana: {}` under `volumes:`. Then follow [Grafana](/grafana), using the U
 
 ## Back up
 
-Compose names the volume `<project>_data`. Running from `deploy/`, the project is `deploy`, so the volume is `deploy_data` (check with `docker volume ls`):
+Compose names the volume `<folder>_data`; for a folder called `tallymoth` that is `tallymoth_data` (check with `docker volume ls`):
 
 ```sh
-docker run --rm -v deploy_data:/data -v $PWD/backup:/backup alpine \
-  sh -c 'apk add --no-cache sqlite >/dev/null && sqlite3 /data/shop/events.db ".backup /backup/shop.db"'
+docker run --rm -v tallymoth_data:/data -v $PWD/backup:/backup alpine \
+  sh -c 'apk add --no-cache sqlite >/dev/null && sqlite3 /data/myapp/events.db ".backup /backup/myapp.db"'
 ```
 
-Replace `shop` with your tenant id. More on [Upgrades and backups](/maintenance).
+Replace `myapp` with your tenant id. More on [Upgrades and backups](/maintenance).
 
 ## Try the demo
 
-To see everything working with synthetic data, no config needed:
+To see everything working with synthetic data and no config, clone the repository and run:
 
 ```sh
-docker compose -f deploy/demo/docker-compose.yml up --build
+docker compose -f examples/demo/docker-compose.yml up --build
 ```
 
 Open <http://localhost:3000> for Grafana. The demo publishes both ports and gives anonymous admin access, so use it for local testing only.

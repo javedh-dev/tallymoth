@@ -11,23 +11,7 @@ flowchart LR
 
 ## With Compose
 
-The repository has `deploy/docker-compose.yml`:
-
-```sh
-cp deploy/.env.example deploy/.env      # set the secrets your config uses
-$EDITOR deploy/config/tallymoth.yaml    # your tenants
-docker compose -f deploy/docker-compose.yml up -d
-```
-
-It pulls `ghcr.io/javedh-dev/tallymoth` (set `TALLYMOTH_VERSION` to pin a version, otherwise `latest`). Use `docker compose up --build` to build from source instead. It runs the container with the safest settings: read-only filesystem, no extra privileges, a non-root user, and a 128 MB memory limit. The data lives in a volume called `data`, which is the thing to back up. It publishes only the public port, and only on `127.0.0.1`.
-
-Settings for `deploy/.env`:
-
-| Variable | Default | Meaning |
-|---|---|---|
-| `TALLYMOTH_BIND` | `127.0.0.1` | Which address to publish on. Use `0.0.0.0` if your proxy is on another machine. |
-| `TALLYMOTH_PORT` | `8080` | The port on the host. |
-| `SCALEBAR_KEY` | empty | The sample config reads this secret. Replace it with the names your own config uses. |
+See the [Docker Compose guide](/docker-compose) for a complete `compose.yaml` you can copy, plus the config, `.env` and Caddy files.
 
 ## Without Compose
 

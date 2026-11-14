@@ -3,7 +3,7 @@
 # Needs: Docker, the static binaries from `go build`, and ~15 GB of free disk for the 10M-event database.
 #
 #   CGO_ENABLED=0 go build -o /tmp/tm ./cmd/tallymoth && CGO_ENABLED=0 go build -o /tmp/bench ./tools/bench
-#   docker build -f deploy/Dockerfile -t tallymoth:bench .
+#   docker build -t tallymoth:bench .
 #   tools/bench/matrix.sh /tmp/tm /tmp/bench /var/tmp/bench-data /var/tmp/bench-out
 #   /tmp/bench -report /var/tmp/bench-out -docs docs/performance.md
 set -u

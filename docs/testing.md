@@ -55,7 +55,7 @@ CGO_ENABLED=0 go build -o /tmp/bench ./tools/bench
 To limit CPU and memory, run the server in Docker:
 
 ```sh
-docker build -f deploy/Dockerfile -t tallymoth:bench .
+docker build -t tallymoth:bench .
 /tmp/bench -bin /tmp/tm -docker tallymoth:bench -cpus 1 -mem 128m
 ```
 

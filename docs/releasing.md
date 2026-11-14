@@ -14,7 +14,7 @@ Follow these steps for every release. The performance step is part of the releas
    V=0.2.0
    CGO_ENABLED=0 go build -ldflags "-X main.version=$V" -o /tmp/tm ./cmd/tallymoth
    CGO_ENABLED=0 go build -o /tmp/bench ./tools/bench
-   docker build --build-arg VERSION=$V -f deploy/Dockerfile -t tallymoth:bench .
+   docker build --build-arg VERSION=$V -f Dockerfile -t tallymoth:bench .
    ```
 4. **Run the benchmarks** on a machine with nothing else running.
    ```sh

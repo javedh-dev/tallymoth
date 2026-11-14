@@ -102,7 +102,7 @@ It is written for the demo data below. For your own events, change the `event=` 
 Demo mode starts a fake tenant with two weeks of made-up events, so you can build panels before you have real data. Do not use it for anything real.
 
 ```sh
-docker build -f deploy/Dockerfile -t tallymoth .
+docker build -t tallymoth .
 docker run -d --name tallymoth-demo -p 8080:8080 -p 8081:8081 tallymoth serve --demo
 ```
 
@@ -120,7 +120,7 @@ It writes about 20,000 events of history with a rising trend and a daily rhythm,
 To start tallymoth, Grafana, the datasource and the dashboard together:
 
 ```sh
-docker compose -f deploy/demo/docker-compose.yml up --build
+docker compose -f examples/demo/docker-compose.yml up --build
 ```
 
 Open `http://localhost:3000`. This Grafana lets anyone in as admin, so use it on your own machine only. The demo keys are public, so never expose a demo server to a network you do not trust.

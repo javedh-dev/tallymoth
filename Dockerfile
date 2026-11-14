@@ -1,4 +1,4 @@
-# Build from the repo root: docker build -f deploy/Dockerfile -t tallymoth .
+# Build from the repo root: docker build -t tallymoth .
 # Runs on the build machine and cross-compiles, so multi-arch images need no emulation.
 FROM --platform=$BUILDPLATFORM golang:1.27 AS build
 ARG VERSION=dev TARGETOS TARGETARCH

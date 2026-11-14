@@ -18,7 +18,7 @@ Or build it from source:
 ```sh
 git clone https://github.com/javedh-dev/tallymoth.git
 cd tallymoth
-docker build -f deploy/Dockerfile -t tallymoth .
+docker build -t tallymoth .
 ```
 
 Prefer a plain program? Download one for your system from the [releases page](https://github.com/javedh-dev/tallymoth/releases) and use `./tallymoth` instead of `docker run --rm tallymoth` below.

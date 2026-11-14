@@ -1,8 +1,8 @@
-# Try tallymoth + Grafana with synthetic data:  docker compose -f deploy/demo/docker-compose.yml up --build
+# Try tallymoth + Grafana with synthetic data:  docker compose -f examples/demo/docker-compose.yml up --build
 # Grafana: http://localhost:3000 (anonymous admin)   tallymoth: :8080 ingest, :8081 query. Local testing only.
 services:
   tallymoth:
-    build: {context: ../.., dockerfile: deploy/Dockerfile}
+    build: {context: ../.., dockerfile: Dockerfile}
     command: ["serve", "--demo"]
     ports: ["127.0.0.1:8080:8080", "127.0.0.1:8081:8081"]
   grafana:
