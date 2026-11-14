@@ -10,3 +10,8 @@ jobs:
       - run: go vet ./...
       - run: go test -race ./...
       - run: python3 -I spec/genvectors.py | diff - spec/vectors.json   # vectors must be reproducible
+      - name: performance smoke test (loose limits, catches order-of-magnitude regressions)
+        run: |
+          CGO_ENABLED=0 go build -o /tmp/tm ./cmd/tallymoth
+          CGO_ENABLED=0 go build -o /tmp/bench ./tools/bench
+          /tmp/bench -bin /tmp/tm -quick -check
