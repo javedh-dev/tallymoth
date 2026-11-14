@@ -101,6 +101,59 @@ ok
 
 `docker compose ps` should show `healthy`. Then send a test event ([Send events](/send-events)).
 
+## Portainer stack
+
+Portainer's web editor has no folder next to the compose file, so the config goes inside the stack with `configs`. Create a stack (Stacks, Add stack, Web editor), paste this, and set `APP_KEY` (and optionally `TALLYMOTH_VERSION`) under **Environment variables**:
+
+```yaml
+services:
+  tallymoth:
+    image: ghcr.io/javedh-dev/tallymoth:${TALLYMOTH_VERSION:-latest}
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 128m
+    stop_grace_period: 20s
+    environment:
+      TALLYMOTH_TRUST_PROXY: "1"
+      TALLYMOTH_TRUSTED_HOPS: "1"
+      GOMEMLIMIT: 100MiB
+      APP_KEY: ${APP_KEY}
+    ports:
+      - "8080:8080"                    # restrict with your firewall or bind to a private address
+    volumes:
+      - data:/data
+    tmpfs: ["/tmp:size=64m"]
+    configs:
+      - source: tallymoth_config
+        target: /config/tallymoth.yaml
+
+configs:
+  tallymoth_config:
+    content: |
+      version: 1
+      server:
+        listen: {public: ":8080", private: ":8081"}
+        data_dir: /data
+      defaults:
+        auth: {mode: signed, pow_bits: 16}
+        limits: {max_body_bytes: 32768, max_batch_events: 50, ip_per_minute: 30, daily_cap: 1000000, max_db_mb: 2048}
+        retention_days: 90
+      tenants:
+        - id: myapp
+          keys:
+            - {id: k_myapp1, secret: "${APP_KEY}"}
+          events:
+            active: [version, os]
+            error: [version, os, kind]
+
+volumes:
+  data:
+```
+
+To change the config, edit the stack and click **Update the stack**; Portainer recreates the container with the new file. This needs standalone Docker or Compose; Docker Swarm does not support inline `content`.
+
 ## Day-to-day
 
 | Task | Command |
